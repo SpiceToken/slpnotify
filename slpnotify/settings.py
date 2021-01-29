@@ -10,11 +10,19 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
+from __future__ import absolute_import
+
 import os
-from decouple import config
+import sys
+import grpc
 import redis
 import psycopg2
+# import bchrpc_pb2_grpc as bchrpc
+
+from decouple import config
 from datetime import timedelta
+
+# sys.path.append('/code/main/bchd/protobuf')
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -37,32 +45,30 @@ ALLOWED_HOSTS = [
 
 # Application definition
 
-INSTALLED_APPS=[
-'django.contrib.auth',
-'django.contrib.contenttypes',
-'django.contrib.sessions',
-'django.contrib.messages',
-'django.contrib.staticfiles',
-'rest_framework',
-'rest_framework.authtoken',
-'corsheaders',
-'main',
-'django.contrib.admin',
-'drf_yasg'
+INSTALLED_APPS = [
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',
+    'main',
+    'django.contrib.admin',
+    'drf_yasg'
 ]
 
-MIDDLEWARE=[
-'django.middleware.security.SecurityMiddleware',
-'django.contrib.sessions.middleware.SessionMiddleware',
-'corsheaders.middleware.CorsMiddleware',
-
-'whitenoise.middleware.WhiteNoiseMiddleware',
-
-'django.middleware.common.CommonMiddleware',
-'django.middleware.csrf.CsrfViewMiddleware',
-'django.contrib.auth.middleware.AuthenticationMiddleware',
-'django.contrib.messages.middleware.MessageMiddleware',
-'django.middleware.clickjacking.XFrameOptionsMiddleware',
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 ROOT_URLCONF = 'slpnotify.urls'
@@ -173,46 +179,46 @@ CELERYD_PREFETCH_MULTIPLIER = 1
 CELERYD_MAX_TASKS_PER_CHILD = 5
 
 CELERY_BEAT_SCHEDULE = {
-    'latest_blockheight_getter': {
-        'task': 'main.tasks.latest_blockheight_getter',
-        'schedule': 5
-    },
-    'second_blockheight_scanner': {
-        'task': 'main.tasks.second_blockheight_scanner',
-        'schedule': 60
-    },
-    'first_blockheight_scanner': {
-        'task': 'main.tasks.first_blockheight_scanner',
-        'schedule': 120
-    },
-    'slpdb_token_scanner': {
-        'task': 'main.tasks.slpdb_token_scanner',
-        'schedule': 600
-    },
-    'openfromredis': {
-        'task': 'main.tasks.openfromredis',
-        'schedule': 300
-    },
-    'slpbitcoinsocketsocket': {
-        'task': 'main.tasks.slpbitcoinsocket',
-        'schedule': 120
-    },
-    'slpfountainheadsocket': {
-        'task': 'main.tasks.slpfountainheadsocket',
-        'schedule': 120
-    },
-    'slpstreamfountainheadsocket': {
-        'task': 'main.tasks.slpstreamfountainheadsocket',
-        'schedule': 120
-    },
-    'bitsocket': {
-        'task': 'main.tasks.bitsocket',
-        'schedule': 120
-    },
-    'bitdbquery': {
-        'task': 'main.tasks.bitdbquery',
-        'schedule': 300
-    }
+    # 'latest_blockheight_getter': {
+    #     'task': 'main.tasks.latest_blockheight_getter',
+    #     'schedule': 5
+    # },
+    # 'second_blockheight_scanner': {
+    #     'task': 'main.tasks.second_blockheight_scanner',
+    #     'schedule': 60
+    # },
+    # 'first_blockheight_scanner': {
+    #     'task': 'main.tasks.first_blockheight_scanner',
+    #     'schedule': 120
+    # },
+    # 'slpdb_token_scanner': {
+    #     'task': 'main.tasks.slpdb_token_scanner',
+    #     'schedule': 600
+    # },
+    # 'openfromredis': {
+    #     'task': 'main.tasks.openfromredis',
+    #     'schedule': 300
+    # },
+    # 'slpbitcoinsocketsocket': {
+    #     'task': 'main.tasks.slpbitcoinsocket',
+    #     'schedule': 120
+    # },
+    # 'slpfountainheadsocket': {
+    #     'task': 'main.tasks.slpfountainheadsocket',
+    #     'schedule': 120
+    # },
+    # 'slpstreamfountainheadsocket': {
+    #     'task': 'main.tasks.slpstreamfountainheadsocket',
+    #     'schedule': 120
+    # },
+    # 'bitsocket': {
+    #     'task': 'main.tasks.bitsocket',
+    #     'schedule': 120
+    # },
+    # 'bitdbquery': {
+    #     'task': 'main.tasks.bitdbquery',
+    #     'schedule': 300
+    # }
 }
 
 CORS_ORIGIN_WHITELIST = [
@@ -264,3 +270,18 @@ SLACK_SIGNING_SECRET = config('SLACK_SIGNING_SECRET', default='')
 
 SLACK_DESTINATION_ADDR = 'https://slpnotify.scibizinformatics.com/slack/notify/'
 SLACK_THEME_COLOR = '#82E0AA'
+
+
+# BCHD GRPC settings
+
+# BCHD_GRPC_URL = config('BCHD_GRPC_URL', default='bchd.fountainhead.cash')
+# BCHD_SSL_CERT_PATH = os.path.join(BASE_DIR, 'bchd.crt')
+
+# if os.path.exists(BCHD_SSL_CERT_PATH):
+#     cert = open(BCHD_SSL_CERT_PATH, 'rb').read()
+#     creds = grpc.ssl_channel_credentials(cert)
+# else:
+#     creds = grpc.ssl_channel_credentials()
+
+# GRPC_CHANNEL = grpc.secure_channel(BCHD_GRPC_URL, creds)
+# GRPC_STUB = bchrpc.bchrpcStub(GRPC_CHANNEL)
