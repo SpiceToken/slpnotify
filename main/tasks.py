@@ -598,7 +598,7 @@ def bitdbquery(self):
         "q": {
             "find": {
             },
-            "limit": 30000
+            "limit": 5000
         }
     }
     json_string = bytes(json.dumps(query), 'utf-8')
