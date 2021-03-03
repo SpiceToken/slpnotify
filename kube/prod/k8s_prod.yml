@@ -34,7 +34,7 @@ spec:
     spec:
       containers  :
         - name: slpnotify
-          image: 967349720785.dkr.ecr.ap-southeast-1.amazonaws.com/spicetrade-prod:ba1f4f15a512
+          image: 967349720785.dkr.ecr.ap-southeast-1.amazonaws.com/slpnotify-prod:ef2e38d6daaa
           env:
             - name: POSTGRES_DB
               value: slpnotify-prod
