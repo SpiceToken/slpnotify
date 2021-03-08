@@ -103,5 +103,3 @@ spec:
                 secretKeyRef:
                   name: slpnotify-credentials
                   key: slacksigningsecret
-      nodeSelector:
-        eks.amazonaws.com/nodegroup: slpnotify-node-group
